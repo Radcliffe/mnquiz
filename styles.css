@@ -1,0 +1,114 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.map-container {
+    width: 60%;
+    max-width: 600px;
+}
+
+.options-container {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.option-btn {
+    padding: 15px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    background-color: #e0e0e0;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.option-btn:hover {
+    background-color: #d0d0d0;
+}
+
+svg {
+    width: 100%;
+    height: auto;
+}
+
+.county {
+    fill: #f0f0f0;
+    stroke: #333;
+    stroke-width: 50;
+    transition: fill 0.3s;
+}
+
+.highlight {
+    fill: pink !important;
+}
+
+.correct {
+    background-color: #a3e4a3 !important;
+}
+
+.incorrect {
+    background-color: #e4a3a3 !important;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+.game-message {
+    height: 30px;
+    font-size: 1.2rem;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+.new-game-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #4a7dbd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.new-game-btn:hover {
+    background-color: #3a6dad;
+}
+
+.game-over {
+    background-color: rgba(255, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    margin: 20px 0;
+}
