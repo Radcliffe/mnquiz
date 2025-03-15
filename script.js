@@ -1,16 +1,17 @@
 // Constants
 const MAX_LIVES = 3;
 const ROUND_DELAY_MS = 1000;
+const DEBUG = false;
 
 // Game state
 let counties = [];
 let currentCounty = null;
 let score = 0;
+let currentStreak = 0;
 let highScore = localStorage.getItem('mnCountiesHighScore') || 0;
 let lives = MAX_LIVES;
 let gameActive = true;
 let previousCounty = null;
-
 
 
 // DOM elements
@@ -43,7 +44,7 @@ async function loadCountyData() {
         createSvgMap();
 
         counties.forEach((county, index) => {
-            county.active = index < 8;
+            county.status = (index < 8) ? 'active' : 'pending';
             county.streak = 0;
         });
 
@@ -89,10 +90,14 @@ function startNewRound() {
     while (true) {
         const randomIndex = Math.floor(Math.random() * counties.length);
         currentCounty = counties[randomIndex];
-        if (currentCounty.active && currentCounty !== previousCounty) {
+        if (currentCounty.status == 'active' && currentCounty !== previousCounty) {
             previousCounty = currentCounty;
             break;
         }
+    }
+
+    if (DEBUG) {
+        console.log('Current County:', currentCounty.id);
     }
     
     // Highlight the selected county
@@ -119,7 +124,7 @@ function generateOptions() {
     const options = [correctCountyName];
     
     // Add 3 random wrong options
-    const activeCounties = counties.filter(c => c.active);
+    const activeCounties = counties.filter(c => c.status == 'active' && c !== currentCounty);
     while (options.length < 4) {
         const randomCounty = activeCounties[Math.floor(Math.random() * activeCounties.length)].id;
         // Ensure no duplicates
@@ -169,20 +174,32 @@ function checkAnswer(selectedOption) {
             localStorage.setItem('mnCountiesHighScore', highScore);
         }
         currentCounty.streak++;
+        currentStreak++;
+        if (currentStreak % 5 === 0 && lives < MAX_LIVES) {
+            lives++;
+            gameMessageElement.textContent += ' +1 life!';
+        }
         if (currentCounty.streak === 3) {
-            currentCounty.active = false;
+            currentCounty.status = 'mastered';
             currentCounty.streak = 0;
             // Choose a random inactive county and make it active
-            const inactiveCounties = counties.filter(c => !c.active);
-            if (inactiveCounties.length > 0) {
-                const randomInactive = inactiveCounties[Math.floor(Math.random() * inactiveCounties.length)];
-                randomInactive.active = true;
+            const pendingCounties = counties.filter(c => c.status === 'pending');
+            if (pendingCounties.length > 0) {
+                const randomCounty = pendingCounties[Math.floor(Math.random() * pendingCounties.length)];
+                randomCounty.status = 'active';
+            } else {
+                const masteredCounties = counties.filter(c => c.status === 'mastered');
+                if (masteredCounties.length > 0) {
+                    const randomCounty = masteredCounties[Math.floor(Math.random() * masteredCounties.length)];
+                    randomCounty.status = 'active';
+                }
             }
         }
     } else {
         lives--;
         gameMessageElement.textContent = `Incorrect! That was ${currentCounty.id}.`;
         currentCounty.streak = 0;
+        currentStreak = 0;
         
         // Check if game over
         if (lives <= 0) {
