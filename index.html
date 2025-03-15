@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Minnesota Counties</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        h1 {
+            color: #003366;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .game-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+        .map-container {
+            flex: 3;
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .controls-container {
+            flex: 2;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .county {
+            fill: #d0e0f0;
+            stroke: white;
+            stroke-width: 0.5;
+            transition: fill 0.3s;
+        }
+        .county:hover {
+            fill: #a0c0e0;
+            cursor: pointer;
+        }
+        .highlighted {
+            fill: #ff9eb6 !important;
+        }
+        .correct {
+            fill: #90ee90 !important;
+        }
+        .incorrect {
+            fill: #ff6b6b !important;
+        }
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .choice-btn {
+            padding: 8px;
+            background-color: #e0e8f0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .choice-btn:hover {
+            background-color: #b8d0e0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .lives {
+            color: #e74c3c;
+        }
+        .score {
+            color: #2980b9;
+        }
+        .high-score {
+            color: #8e44ad;
+        }
+        .replay-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        .replay-btn:hover {
+            background-color: #2980b9;
+        }
+        .county-name {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 15px;
+            height: 36px;
+            color: #003366;
+        }
+        .game-over {
+            font-size: 24px;
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Learn Minnesota Counties</h1>
+    <div class="game-container">
+        <div class="map-container">
+            <svg id="mn-map" viewBox="0 0 600 750" xmlns="http://www.w3.org/2000/svg">
+                <!-- Minnesota counties SVG paths will be inserted here via JavaScript -->
+            </svg>
+        </div>
+        <div class="controls-container">
+            <div class="stats">
+                <div class="lives">Lives: <span id="lives">3</span></div>
+                <div class="score">Score: <span id="score">0</span></div>
+                <div class="high-score">High Score: <span id="high-score">0</span></div>
+            </div>
+            <div class="county-name" id="county-name">Which county is highlighted?</div>
+            <div class="choices" id="choices">
+                <!-- County choices will be inserted here via JavaScript -->
+            </div>
+            <div id="game-over-message"></div>
+            <button class="replay-btn" id="replay-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Minnesota counties data with names and paths
+        const minnesotaCounties = [
+            { name: "Aitkin", path: "M380 200 L410 200 L410 220 L440 220 L440 250 L410 250 L410 280 L380 280 L380 250 L350 250 L350 220 L380 220 Z" },
+            { name: "Anoka", path: "M350 310 L380 310 L380 340 L350 340 Z" },
+            { name: "Becker", path: "M170 170 L200 170 L200 200 L170 200 Z" },
+            { name: "Beltrami", path: "M230 80 L290 80 L290 140 L230 140 Z" },
+            { name: "Benton", path: "M350 280 L380 280 L380 310 L350 310 Z" },
+            { name: "Big Stone", path: "M110 240 L140 240 L140 270 L110 270 Z" },
+            { name: "Blue Earth", path: "M260 400 L290 400 L290 430 L260 430 Z" },
+            { name: "Brown", path: "M230 400 L260 400 L260 430 L230 430 Z" },
+            { name: "Carlton", path: "M410 220 L440 220 L440 250 L410 250 Z" },
+            { name: "Carver", path: "M290 340 L320 340 L320 370 L290 370 Z" },
+            { name: "Cass", path: "M290 170 L320 170 L320 200 L290 200 L290 230 L260 230 L260 200 L290 200 Z" },
+            { name: "Chippewa", path: "M170 300 L200 300 L200 330 L170 330 Z" },
+            { name: "Chisago", path: "M380 280 L410 280 L410 310 L380 310 Z" },
+            { name: "Clay", path: "M140 170 L170 170 L170 200 L140 200 Z" },
+            { name: "Clearwater", path: "M200 110 L230 110 L230 140 L200 140 Z" },
+            { name: "Cook", path: "M530 160 L560 160 L560 190 L530 190 Z" },
+            { name: "Cottonwood", path: "M200 400 L230 400 L230 430 L200 430 Z" },
+            { name: "Crow Wing", path: "M290 200 L320 200 L320 230 L290 230 Z" },
+            { name: "Dakota", path: "M320 340 L350 340 L350 370 L320 370 Z" },
+            { name: "Dodge", path: "M320 400 L350 400 L350 430 L320 430 Z" },
+            { name: "Douglas", path: "M200 230 L230 230 L230 260 L200 260 Z" },
+            { name: "Faribault", path: "M260 430 L290 430 L290 460 L260 460 Z" },
+            { name: "Fillmore", path: "M320 430 L350 430 L350 460 L320 460 Z" },
+            { name: "Freeborn", path: "M290 430 L320 430 L320 460 L290 460 Z" },
+            { name: "Goodhue", path: "M350 370 L380 370 L380 400 L350 400 Z" },
+            { name: "Grant", path: "M170 200 L200 200 L200 230 L170 230 Z" },
+            { name: "Hennepin", path: "M320 310 L350 310 L350 340 L320 340 Z" },
+            { name: "Houston", path: "M350 430 L380 430 L380 460 L350 460 Z" },
+            { name: "Hubbard", path: "M230 140 L260 140 L260 170 L230 170 Z" },
+            { name: "Isanti", path: "M380 280 L410 280 L410 310 L380 310 Z" },
+            { name: "Itasca", path: "M350 140 L380 140 L380 170 L350 170 L350 200 L320 200 L320 170 L350 170 Z" },
+            { name: "Jackson", path: "M200 430 L230 430 L230 460 L200 460 Z" },
+            { name: "Kanabec", path: "M380 250 L410 250 L410 280 L380 280 Z" },
+            { name: "Kandiyohi", path: "M230 300 L260 300 L260 330 L230 330 Z" },
+            { name: "Kittson", path: "M170 20 L200 20 L200 50 L170 50 Z" },
+            { name: "Koochiching", path: "M350 80 L380 80 L380 110 L410 110 L410 140 L350 140 Z" },
+            { name: "Lac qui Parle", path: "M140 270 L170 270 L170 300 L140 300 Z" },
+            { name: "Lake", path: "M500 160 L530 160 L530 190 L500 190 Z" },
+            { name: "Lake of the Woods", path: "M260 50 L290 50 L290 80 L260 80 Z" },
+            { name: "Le Sueur", path: "M290 370 L320 370 L320 400 L290 400 Z" },
+            { name: "Lincoln", path: "M140 360 L170 360 L170 390 L140 390 Z" },
+            { name: "Lyon", path: "M170 360 L200 360 L200 390 L170 390 Z" },
+            { name: "Mahnomen", path: "M200 140 L230 140 L230 170 L200 170 Z" },
+            { name: "Marshall", path: "M200 50 L230 50 L230 80 L200 80 L200 110 L170 110 L170 80 L200 80 Z" },
+            { name: "Martin", path: "M230 430 L260 430 L260 460 L230 460 Z" },
+            { name: "McLeod", path: "M260 340 L290 340 L290 370 L260 370 Z" },
+            { name: "Meeker", path: "M260 310 L290 310 L290 340 L260 340 Z" },
+            { name: "Mille Lacs", path: "M350 250 L380 250 L380 280 L350 280 Z" },
+            { name: "Morrison", path: "M290 250 L320 250 L320 280 L290 280 Z" },
+            { name: "Mower", path: "M320 430 L350 430 L350 460 L320 460 Z" },
+            { name: "Murray", path: "M170 390 L200 390 L200 420 L170 420 Z" },
+            { name: "Nicollet", path: "M260 370 L290 370 L290 400 L260 400 Z" },
+            { name: "Nobles", path: "M170 430 L200 430 L200 460 L170 460 Z" },
+            { name: "Norman", path: "M140 110 L170 110 L170 140 L140 140 Z" },
+            { name: "Olmsted", path: "M350 400 L380 400 L380 430 L350 430 Z" },
+            { name: "Otter Tail", path: "M170 170 L200 170 L200 200 L230 200 L230 230 L170 230 Z" },
+            { name: "Pennington", path: "M170 80 L200 80 L200 110 L170 110 Z" },
+            { name: "Pine", path: "M410 250 L440 250 L440 280 L410 280 Z" },
+            { name: "Pipestone", path: "M140 390 L170 390 L170 420 L140 420 Z" },
+            { name: "Polk", path: "M140 80 L170 80 L170 110 L140 110 L140 140 L110 140 L110 110 L140 110 Z" },
+            { name: "Pope", path: "M200 230 L230 230 L230 260 L200 260 Z" },
+            { name: "Ramsey", path: "M350 340 L380 340 L380 370 L350 370 Z" },
+            { name: "Red Lake", path: "M170 110 L200 110 L200 140 L170 140 Z" },
+            { name: "Redwood", path: "M200 360 L230 360 L230 390 L200 390 Z" },
+            { name: "Renville", path: "M230 330 L260 330 L260 360 L230 360 Z" },
+            { name: "Rice", path: "M320 370 L350 370 L350 400 L320 400 Z" },
+            { name: "Rock", path: "M140 430 L170 430 L170 460 L140 460 Z" },
+            { name: "Roseau", path: "M200 20 L230 20 L230 50 L200 50 Z" },
+            { name: "Scott", path: "M320 340 L350 340 L350 370 L320 370 Z" },
+            { name: "Sherburne", path: "M350 280 L380 280 L380 310 L350 310 Z" },
+            { name: "Sibley", path: "M260 340 L290 340 L290 370 L260 370 Z" },
+            { name: "St. Louis", path: "M440 140 L470 140 L470 170 L500 170 L500 200
