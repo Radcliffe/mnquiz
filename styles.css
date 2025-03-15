@@ -15,8 +15,7 @@ body {
 }
 
 .map-container {
-    width: 60%;
-    max-width: 600px;
+    width: 400px;
 }
 
 .options-container {
