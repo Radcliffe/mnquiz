@@ -22,6 +22,7 @@ const highScoreElement = document.getElementById('high-score');
 const livesElement = document.getElementById('lives');
 const gameMessageElement = document.getElementById('game-message');
 const newGameBtn = document.getElementById('new-game-btn');
+const gameOverElement = document.getElementById('game-over');
 
 // Update display
 function updateStats() {
@@ -221,24 +222,14 @@ function endGame() {
     gameActive = false;
     // gameMessageElement.textContent = '';
     
-    const gameOverMessage = document.createElement('div');
-    gameOverMessage.className = 'game-over';
-    gameOverMessage.innerHTML = `
-        <h2>Game Over!</h2>
-        <p>Your final score: ${score}</p>
-        <p>High score: ${highScore}</p>
-    `;
-    
-    document.querySelector('.game-container').appendChild(gameOverMessage);
+    // Show game over message
+    gameOverElement.style.display = 'block';
 }
 
 // Start a new game
 function newGame() {
     // Remove game over message if present
-    const gameOverMessage = document.querySelector('.game-over');
-    if (gameOverMessage) {
-        gameOverMessage.remove();
-    }
+    gameOverElement.style.display = 'none';
     
     // Reset game state
     score = 0;

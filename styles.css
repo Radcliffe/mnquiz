@@ -105,6 +105,8 @@ body {
   }
   
   .game-over {
+    display: none;
+    width: 100%;
     background-color: rgba(255, 0, 0, 0.1);
     padding: 20px;
     border-radius: 5px;
@@ -178,6 +180,10 @@ body {
 
     .new-game-btn {
         width: 100%;
+    }
+
+    .hidden {
+      display: none;
     }
   }
   
