@@ -166,14 +166,18 @@ body {
       font-size: 1rem;
       flex-wrap: wrap;
     }
-    
-    .county {
-      stroke-width: 30; /* Reducing stroke width for better mobile display */
-    }
-    
+
     .option-btn {
       padding: 12px;
       font-size: 1rem;
+    }
+
+    .controls {
+        margin-top: 0px;
+    }
+
+    .new-game-btn {
+        width: 100%;
     }
   }
   
@@ -205,16 +209,16 @@ body {
       min-height: 30px;
     }
     
-    .county {
-      stroke-width: 20; /* Further reducing stroke width for small screens */
-    }
-    
     .option-btn {
-      padding: 10px;
+      padding: 8px;
       font-size: 0.9rem;
     }
     
     .new-game-btn {
-      width: 100%;
+        width: 100%;
+    }
+
+    .controls {
+        margin-top: 0px;
     }
   }
